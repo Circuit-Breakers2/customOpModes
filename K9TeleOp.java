@@ -55,10 +55,7 @@ public class K9TeleOp extends OpMode {
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
-
-	Servo servo;
-
-	double servoIncrement = 0.1;
+	DcMotor motorGate;
 
 	//Scale constant to scale the joystick value by
 	double SCALE = 0.01;
@@ -85,13 +82,13 @@ public class K9TeleOp extends OpMode {
 		 * configured your robot and created the configuration file.
 		 */
 
-		// Initialize motors
+		// Initialize drive motors
 		motorRight = hardwareMap.dcMotor.get("motor_2");
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-		// Initialize servo
-		servo = hardwareMap.servo.get("servo_1");
+		// Initialize gate motor
+		motorGate = hardwareMap.dcMotor.get("motor_3");
 		
 	}
 
@@ -129,9 +126,12 @@ public class K9TeleOp extends OpMode {
 
 		// Read right stick value
 		float stickPosition = gamepad1.right_stick_y;
+		
+		// Scale stick value
+		stickPosition = (float)scaleInput(stickPosition);
 
-		// Set stick value to servo
-		servo.setPosition((stickPosition / 2) + 0.5); 
+		// Set stick power value to gate
+		motorGate.setPower(stickPosition);
 	}
 
 	/*
