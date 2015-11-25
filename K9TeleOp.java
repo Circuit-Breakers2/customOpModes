@@ -92,7 +92,6 @@ public class K9TeleOp extends OpMode {
 
 		// Initialize servo
 		servo = hardwareMap.servo.get("servo_1");
-		servo.setDirection(Servo.Direction.REVERSE);
 		
 	}
 
@@ -129,10 +128,11 @@ public class K9TeleOp extends OpMode {
 		motorLeft.setPower(left);
 
 		// Read right stick value
-		float stickPosition = gamepad1.right_stick_y;
+		float stickPosition = -gamepad1.right_stick_y;
 
 		// Set stick value to servo
 		servo.setPosition((stickPosition / 2) + 0.5); 
+		
 	}
 
 	/*
@@ -170,6 +170,7 @@ public class K9TeleOp extends OpMode {
 		}
 		
 		return dScale;
+		
 	}
 
 }
