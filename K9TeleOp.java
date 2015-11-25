@@ -79,6 +79,20 @@ public class K9TeleOp extends OpMode {
 	/**
 	 * Constructor
 	 */
+
+	Servo servo1;
+	Servo servo2;
+
+	//Position constants for the buttons
+	double DOWN_POSITION = 0.1;
+	double UP_POSITION = 0.1;
+
+	//Scale constant to scale the joystick value by
+	double SCALE = 0.01;
+	//Variable for the servo's current position
+	double currentPosition;
+
+
 	public K9TeleOp() {
 
 	}
@@ -121,6 +135,11 @@ public class K9TeleOp extends OpMode {
 		// assign the starting position of the wrist and claw
 		armPosition = 0.0;
 		clawPosition = 0.0;
+
+		servo1 = hardwareMap.servo.get("left_hand");
+		servo2 = hardwareMap.servo.get("right_hand");
+		//Set the current position to a known value
+		currentPosition = 0.5;
 	}
 
 	/*
@@ -203,6 +222,16 @@ public class K9TeleOp extends OpMode {
 		//claw.setPosition(clawPosition);
 
 
+		//Move servo 1 to the up position when a button is pressed
+		if(gamepad1.y) {
+			servo1.setPosition(UP_POSITION);
+			servo2.setPosition(UP_POSITION);
+		}
+		//Move servo 1 to the down position when a button is pressed
+		if(gamepad1.a) {
+			servo1.setPosition(DOWN_POSITION);
+			servo2.setPosition(DOWN_POSITION);
+		}
 
 
 		/*
@@ -210,12 +239,12 @@ public class K9TeleOp extends OpMode {
 		 * a legacy NXT-compatible motor controller, then the getPower() method
 		 * will return a null value. The legacy NXT-compatible motor controllers
 		 * are currently write only.
-		 */
+
         telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("arm", "arm:  " + String.format("%.2f", armPosition));
         telemetry.addData("claw", "claw:  " + String.format("%.2f", clawPosition));
         telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
-        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
+        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right)); */
 
 	}
 
