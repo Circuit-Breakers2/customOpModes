@@ -90,10 +90,9 @@ public class K9TeleOp extends OpMode {
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-		// Initialize servos
+		// Initialize servo
 		servo = hardwareMap.servo.get("servo_1");
-		//Set the current position to a known value
-		currentPosition;
+		
 	}
 
 	/*
@@ -128,24 +127,11 @@ public class K9TeleOp extends OpMode {
 		motorRight.setPower(right);
 		motorLeft.setPower(left);
 
-		//Open gates when 'y' is pressed
-		if(gamepad1.y) {
-			// Increment each servo so that the gates open
-			currentPosition += servoIncrement;
+		// Read right stick value
+		float stickPosition = gamepad1.right_stick_y;
 
-			// Write the new positions to the servos
-			servo.setPosition(currentPosition);
-		}
-		//Close gates when 'a' is pressed
-		if(gamepad1.a) {
-			// Increment each servo so that the gates close
-			currentPosition -= servoIncrement;
-
-			// Write the new positions to the servos
-			servo.setPosition(currentPosition);
-		}
-
-
+		// Set stick value to servo
+		servo.setPosition((stickPosition / 2) + 0.5); 
 	}
 
 	/*
