@@ -1,4 +1,4 @@
 # customOpModes
-use K9TeleOp or K9TankDrive
+use K9TeleOp, update any final driver methods to it
 
 uselessOps is filled with example op modes
