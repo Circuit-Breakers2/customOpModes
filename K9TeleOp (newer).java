@@ -30,55 +30,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.Range;
-import java.util.LinkedList;
+import java.io.*;
+
 /**
  * TeleOp Mode
  * <p>
  * Enables control of the robot via the gamepad
  */
-public class K9TankDrive extends OpMode {
+public class K9TeleOp extends OpMode {
+	
 	/*
 	 * Note: the configuration of the servos is such that
 	 * as the arm servo approaches 0, the arm position moves up (away from the floor).
 	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
 	 */
-    // TETRIX VALUES.
+	// TETRIX VALUES.
+	final static double ARM_MIN_RANGE  = 0;
+	final static double ARM_MAX_RANGE  = 1;
+	final static double CLAW_MIN_RANGE  = 0.20;
+	final static double CLAW_MAX_RANGE  = 0.7;
+
 	// position of the arm servo.
 	double armPosition;
 
 	// amount to change the arm servo position.
-	double armDelta = 0.1;
+	//double armDelta = 0.1;
 
 	// position of the claw servo
 	double clawPosition;
 
 	// amount to change the claw servo position by
-	double clawDelta = 0.1;
+	//double clawDelta = 0.1;
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
-	DcMotor motorTape;
 	//Servo claw;
-	//Servo arm;
+	Servo arm;
+	//TouchSensor touchsensor;
+	//UltrasonicSensor ultrasonicsensor;
 
 	/**
 	 * Constructor
 	 */
-	public K9TankDrive() {
+	public K9TeleOp() {
+
 	}
 
-
 	/*
-	 * Code to run when the op mode is first enabled goes here
+	 * Code to run when the op mode is initialized goes here
 	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
+	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#init()
 	 */
 	@Override
 	public void init() {
+
+
 		/*
 		 * Use the hardwareMap to get the dc motors and servos by name. Note
 		 * that the names of the devices must match the names used when you
@@ -89,23 +103,25 @@ public class K9TankDrive extends OpMode {
 		 * For the demo Tetrix K9 bot we assume the following,
 		 *   There are two motors "motor_1" and "motor_2"
 		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot.
+		 *   "motor_2" is on the left side of the bot and reversed.
 		 *   
 		 * We also assume that there are two servos "servo_1" and "servo_6"
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-		motorRight = hardwareMap.dcMotor.get("motor_2");
-		motorLeft = hardwareMap.dcMotor.get("motor_1");
+		motorRight = hardwareMap.dcMotor.get("motor_1");
+		motorLeft = hardwareMap.dcMotor.get("motor_2");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
-		motorTape = hardwareMap.dcMotor.get("motor_3");
-		
-		//arm = hardwareMap.servo.get("servo_1");
+
+		//no servos right now
+		arm = hardwareMap.servo.get("servo_1");
 		//claw = hardwareMap.servo.get("servo_6");
+		//touchsensor = hardwareMap.touchSensor.get("touch_s");
+		//ultrasonicsensor = hardwareMap.ultrasonicSensor.get("ultra_s");
 
 		// assign the starting position of the wrist and claw
-		armPosition = 0.2;
-		clawPosition = 0.2;
+		armPosition = 0.0;
+		clawPosition = 0.0;
 	}
 
 	/*
@@ -123,16 +139,18 @@ public class K9TankDrive extends OpMode {
 		 * wrist/claw via the a,b, x, y buttons
 		 */
 
-        // tank drive
-        // note that if y equal -1 then joystick is pushed all of the way forward.
-        float left = -gamepad1.left_stick_y;
-        float right = -gamepad1.right_stick_y;
-		float poweer = gamepad1.right_trigger - gamepad1.left_trigger;
+		// throttle: left_stick_y ranges from -1 to 1, where -1 is full up, and
+		// 1 is full down
+		// direction: left_stick_x ranges from -1 to 1, where -1 is full left
+		// and 1 is full right
+		float throttle = -gamepad1.left_stick_y;
+		float direction = -gamepad1.left_stick_x;
+		float right = throttle - direction;
+		float left = throttle + direction;
 
 		// clip the right/left values so that the values never exceed +/- 1
 		right = Range.clip(right, -1, 1);
 		left = Range.clip(left, -1, 1);
-		poweer = Range.clip(poweer, -1, 1);
 
 		// scale the joystick value to make it easier to control
 		// the robot more precisely at slower speeds.
@@ -142,20 +160,51 @@ public class K9TankDrive extends OpMode {
 		// write the values to the motors
 		motorRight.setPower(right);
 		motorLeft.setPower(left);
-		motorTape.setPower(poweer);
+		//arm.setPosition((gamepad1.right_stick_x)/2 + 0.5);
+		//claw.setPosition((gamepad1.right_stick_x)/2 +0.5);
+		/*if(touchsensor.isPressed()){
+			motorLeft.setPower(1);
+			motorRight.setPower(1);
+			while(!touchsensor.isPressed()){}
+		}
+		if(ultrasonicsensor.getUltrasonicLevel() < 50){
+			motorLeft.setPower(-1);
+			motorRight.setPower(-1);
+			while(!touchsensor.isPressed()){}
+		}*/
 
 		// update the position of the arm.
 		/*if (gamepad1.a) {
 			// if the A button is pushed on gamepad1, increment the position of
 			// the arm servo.
-			for(int i = 0; i < thelist.size();){
-				motorLeft.setPower(thelist.get(i++));
-				motorRight.setPower(thelist.get(i++));
-			}
+			armPosition += armDelta;
+		}
+
+		if (gamepad1.y) {
+			// if the Y button is pushed on gamepad1, decrease the position of
+			// the arm servo.
+			armPosition -= armDelta;
+		}
+
+		// update the position of the claw
+		if (gamepad1.x) {
+			clawPosition += clawDelta;
+		}
+
+		if (gamepad1.b) {
+			clawPosition -= clawDelta;
 		}*/
+
+        // clip the position values so that they never exceed their allowed range.
+        //armPosition = Range.clip(armPosition, ARM_MIN_RANGE, ARM_MAX_RANGE);
+        //clawPosition = Range.clip(clawPosition, CLAW_MIN_RANGE, CLAW_MAX_RANGE);
+
 		// write position values to the wrist and claw servo
 		//arm.setPosition(armPosition);
 		//claw.setPosition(clawPosition);
+
+
+
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
@@ -163,13 +212,11 @@ public class K9TankDrive extends OpMode {
 		 * will return a null value. The legacy NXT-compatible motor controllers
 		 * are currently write only.
 		 */
-		telemetry.addData("Text", "*** Robot Data***");
+        telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("arm", "arm:  " + String.format("%.2f", armPosition));
         telemetry.addData("claw", "claw:  " + String.format("%.2f", clawPosition));
-		telemetry.addData("left tgt pwr", "left  pwr: " + String.format("%.2f", left));
-		telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
-		//thelist.add(left);
-		//thelist.add(right);
+        telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
+        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
 
 	}
 
@@ -180,6 +227,7 @@ public class K9TankDrive extends OpMode {
 	 */
 	@Override
 	public void stop() {
+
 	}
 	
 	/*
