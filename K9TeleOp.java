@@ -29,6 +29,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -51,41 +52,13 @@ public class K9TeleOp extends OpMode {
 	 * as the arm servo approaches 0, the arm position moves up (away from the floor).
 	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
 	 */
-	// TETRIX VALUES.
-	/*final static double ARM_MIN_RANGE  = 0.20;
-	final static double ARM_MAX_RANGE  = 0.90;
-	final static double CLAW_MIN_RANGE  = 0.20;
-	final static double CLAW_MAX_RANGE  = 0.7;*/
-
-	// position of the arm servo.
-	double armPosition;
-
-	// amount to change the arm servo position.
-	//double armDelta = 0.1;
-
-	// position of the claw servo
-	double clawPosition;
-
-	// amount to change the claw servo position by
-	//double clawDelta = 0.1;
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
-	//Servo claw;
-	//Servo arm;
-	//TouchSensor touchsensor;
-	//UltrasonicSensor ultrasonicsensor;
 
-	/**
-	 * Constructor
-	 */
+	Servo servo;
 
-	Servo servo1;
-	Servo servo2;
-
-	//Position constants for the buttons
-	double DOWN_POSITION = 0.1;
-	double UP_POSITION = 0.1;
+	double servoIncrement = 0.1;
 
 	//Scale constant to scale the joystick value by
 	double SCALE = 0.01;
@@ -111,35 +84,15 @@ public class K9TeleOp extends OpMode {
 		 * that the names of the devices must match the names used when you
 		 * configured your robot and created the configuration file.
 		 */
-		
-		/*
-		 * For the demo Tetrix K9 bot we assume the following,
-		 *   There are two motors "motor_1" and "motor_2"
-		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot and reversed.
-		 *   
-		 * We also assume that there are two servos "servo_1" and "servo_6"
-		 *    "servo_1" controls the arm joint of the manipulator.
-		 *    "servo_6" controls the claw joint of the manipulator.
-		 */
+
+		// Initialize motors
 		motorRight = hardwareMap.dcMotor.get("motor_2");
 		motorLeft = hardwareMap.dcMotor.get("motor_1");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
-		//no servos right now
-		//arm = hardwareMap.servo.get("servo_1");
-		//claw = hardwareMap.servo.get("servo_6");
-		//touchsensor = hardwareMap.touchSensor.get("touch_s");
-		//ultrasonicsensor = hardwareMap.ultrasonicSensor.get("ultra_s");
-
-		// assign the starting position of the wrist and claw
-		armPosition = 0.0;
-		clawPosition = 0.0;
-
-		servo1 = hardwareMap.servo.get("left_hand");
-		servo2 = hardwareMap.servo.get("right_hand");
-		//Set the current position to a known value
-		currentPosition = 0.5;
+		// Initialize servo
+		servo = hardwareMap.servo.get("servo_1");
+		
 	}
 
 	/*
@@ -151,18 +104,13 @@ public class K9TeleOp extends OpMode {
 	public void loop() {
 
 		/*
-		 * Gamepad 1
-		 * 
-		 * Gamepad 1 controls the motors via the left stick, and it controls the
-		 * wrist/claw via the a,b, x, y buttons
+		 * Left joystick: Robot Drive
+		 * Y: open gate
+		 * A: close gate
 		 */
 
-		// throttle: left_stick_y ranges from -1 to 1, where -1 is full up, and
-		// 1 is full down
-		// direction: left_stick_x ranges from -1 to 1, where -1 is full left
-		// and 1 is full right
 		float throttle = -gamepad1.left_stick_y;
-		float direction = -gamepad1.left_stick_x;
+		float direction = gamepad1.left_stick_x;
 		float right = throttle - direction;
 		float left = throttle + direction;
 
@@ -170,82 +118,21 @@ public class K9TeleOp extends OpMode {
 		right = Range.clip(right, -1, 1);
 		left = Range.clip(left, -1, 1);
 
-		// scale the joystick value to make it easier to control
-		// the robot more precisely at slower speeds.
+		/* Scale the joystick value to make it easier to control
+		 * the robot more precisely at slower speeds. */
 		right = (float)scaleInput(right);
 		left =  (float)scaleInput(left);
 		
 		// write the values to the motors
 		motorRight.setPower(right);
 		motorLeft.setPower(left);
-		//arm.setPosition((gamepad1.right_stick_x)/2 + 0.5);
-		//claw.setPosition((gamepad1.right_stick_x)/2 +0.5);
-		/*if(touchsensor.isPressed()){
-			motorLeft.setPower(1);
-			motorRight.setPower(1);
-			while(!touchsensor.isPressed()){}
-		}
-		if(ultrasonicsensor.getUltrasonicLevel() < 50){
-			motorLeft.setPower(-1);
-			motorRight.setPower(-1);
-			while(!touchsensor.isPressed()){}
-		}*/
 
-		// update the position of the arm.
-		/*if (gamepad1.a) {
-			// if the A button is pushed on gamepad1, increment the position of
-			// the arm servo.
-			armPosition += armDelta;
-		}
+		// Read right stick value
+		float stickPosition = -gamepad1.right_stick_y;
 
-		if (gamepad1.y) {
-			// if the Y button is pushed on gamepad1, decrease the position of
-			// the arm servo.
-			armPosition -= armDelta;
-		}
-
-		// update the position of the claw
-		if (gamepad1.x) {
-			clawPosition += clawDelta;
-		}
-
-		if (gamepad1.b) {
-			clawPosition -= clawDelta;
-		}*/
-
-        // clip the position values so that they never exceed their allowed range.
-        //armPosition = Range.clip(armPosition, ARM_MIN_RANGE, ARM_MAX_RANGE);
-        //clawPosition = Range.clip(clawPosition, CLAW_MIN_RANGE, CLAW_MAX_RANGE);
-
-		// write position values to the wrist and claw servo
-		//arm.setPosition(armPosition);
-		//claw.setPosition(clawPosition);
-
-
-		//Move servo 1 to the up position when a button is pressed
-		if(gamepad1.y) {
-			servo1.setPosition(UP_POSITION);
-			servo2.setPosition(UP_POSITION);
-		}
-		//Move servo 1 to the down position when a button is pressed
-		if(gamepad1.a) {
-			servo1.setPosition(DOWN_POSITION);
-			servo2.setPosition(DOWN_POSITION);
-		}
-
-
-		/*
-		 * Send telemetry data back to driver station. Note that if we are using
-		 * a legacy NXT-compatible motor controller, then the getPower() method
-		 * will return a null value. The legacy NXT-compatible motor controllers
-		 * are currently write only.
-
-        telemetry.addData("Text", "*** Robot Data***");
-        telemetry.addData("arm", "arm:  " + String.format("%.2f", armPosition));
-        telemetry.addData("claw", "claw:  " + String.format("%.2f", clawPosition));
-        telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
-        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right)); */
-
+		// Set stick value to servo
+		servo.setPosition((stickPosition / 2) + 0.5); 
+		
 	}
 
 	/*
@@ -283,6 +170,7 @@ public class K9TeleOp extends OpMode {
 		}
 		
 		return dScale;
+		
 	}
 
 }
