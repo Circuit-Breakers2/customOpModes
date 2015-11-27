@@ -7,54 +7,69 @@ import com.qualcomm.robotcore.hardware.*;
  * Created by KK on 11/26/2015.
  */
 public class FINAALL extends OpMode {
-    //instantiate motors
+    
+    //initialize motors
     DcMotor motorRight;
     DcMotor motorLeft;
     DcMotor motorTape;
-    DcMotor motorGrabber;
+    //DcMotor motorGrabber;
+    
     public FINAALL(){
 
     }
+    
+    
     public void init(){
         //map motors
-        motorRight = hardwareMap.dcMotor.get("motor_2");
         motorLeft = hardwareMap.dcMotor.get("motor_1");
+        motorRight = hardwareMap.dcMotor.get("motor_2");
         motorTape = hardwareMap.dcMotor.get("motor_3");
-        motorGrabber = hardwareMap.dcMotor.get("motor_4");
+        //motorGrabber = hardwareMap.dcMotor.get("motor_4");
+        
         //reverse left so it matches right
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
     }
+    
+    
     public void loop(){
-        //get values
+        //get values from gamepad
         float left = -gamepad1.left_stick_y;
         float right = -gamepad1.right_stick_y;
         float poweer = gamepad2.right_trigger - gamepad1.left_trigger;
-        float grabber = -gamepad2.left_stick_y;
+        //float grabber = -gamepad2.left_stick_y;
+        
         //clip values
         right = Range.clip(right, -1, 1);
         left = Range.clip(left, -1, 1);
         poweer = Range.clip(poweer, -1, 1);
-        grabber = Range.clip(grabber, -1, 1);
+        //grabber = Range.clip(grabber, -1, 1);
+        
         //scale values
         right = (float)scaleInput(right);
         left =  (float)scaleInput(left);
         poweer = (float)scaleInput(right);
-        grabber =  (float)scaleInput(left);
+        //grabber =  (float)scaleInput(left);
+        
         //set values
         motorRight.setPower(right);
         motorLeft.setPower(left);
         motorTape.setPower(poweer);
-        motorGrabber.setPower(grabber);
+        //motorGrabber.setPower(grabber);
+        
         //telemetry
         telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("tape", "tape:  " + String.format("%.2f", poweer));
-        telemetry.addData("grabber", "grabber:  " + String.format("%.2f", grabber));
+        //telemetry.addData("grabber", "grabber:  " + String.format("%.2f", grabber));
         telemetry.addData("left tgt pwr", "left  pwr: " + String.format("%.2f", left));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
     }
+    
+    
     public void stop(){
 
     }
+    
+    
     double scaleInput(double dVal)  {
         double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
                 0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
