@@ -1,14 +1,9 @@
 # customOpModes
 
-FINAALL is the one we're using
+###Autonomous mode:
+AutonomousMode.java
 
-as of now, has 4 motors - left, right, tape, grabber
-
-
-comment out grabber before running
-
-
-also the code has COMMENTS
-
+###Driver Control Period:
+K9TeleOp.java
 
 uselessOps is useless
