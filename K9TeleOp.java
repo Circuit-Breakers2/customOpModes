@@ -28,7 +28,7 @@ public class K9TeleOp extends OpMode {
         
         //reverse left so it matches right
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
-        motorTape = hardwareMap.
+        motorTape.setDirection(DcMotor.Direction.REVERSE);
     }
     
     
