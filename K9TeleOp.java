@@ -27,7 +27,7 @@ public class K9TeleOp extends OpMode {
         motorGrabber = hardwareMap.dcMotor.get("motor_4");
         
         //reverse left so it matches right
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorRight.setDirection(DcMotor.Direction.REVERSE);
         motorTape.setDirection(DcMotor.Direction.REVERSE);
     }
     
@@ -36,13 +36,12 @@ public class K9TeleOp extends OpMode {
         //get values from gamepad
         float left = -gamepad1.left_stick_y;
         float right = -gamepad1.right_stick_y;
-        float power = -gamepad2.right_stick_y;
+        float power = gamepad2.right_trigger - gamepad2.left_trigger;
         float grabber = -gamepad2.left_stick_y;
         
         //clip values
         right = Range.clip(right, -1, 1);
         left = Range.clip(left, -1, 1);
-        power = Range.clip(power, -1, 1);
         grabber = Range.clip(grabber, -1, 1);
         
         //scale values
