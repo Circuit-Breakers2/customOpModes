@@ -34,10 +34,10 @@ public class K9TeleOp extends OpMode {
     
     public void loop(){
         //get values from gamepad
-        float left = -gamepad1.left_stick_y;
-        float right = -gamepad1.right_stick_y;
-        float power = gamepad2.right_trigger - gamepad2.left_trigger;
-        float grabber = -gamepad2.left_stick_y;
+        float left = -gamepad2.left_stick_y;
+        float right = -gamepad2.right_stick_y;
+        float power = gamepad1.right_trigger - gamepad1.left_trigger;
+        float grabber = -gamepad1.left_stick_y;
         
         //clip values
         right = Range.clip(right, -1, 1);
