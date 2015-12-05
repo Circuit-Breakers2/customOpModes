@@ -11,9 +11,26 @@ public class CookieMonsterAutoB1 extends OpMode{
     //Initialize DC motors
     DcMotor motorLeft;
     DcMotor motorRight;
+    //DcMotor motorGrabber;
 
     //Initialize servo
     Servo basketTilt;
+
+    //---------Encoder configuration-------------
+    //Preferences
+    final static int ENCODER_CPR = 1440;        //Encoder counts per rotation
+    final static double GEAR_RATIO = 1.5;       //How many rotations from motor gear to wheel gear (80 to 120)
+    final static double CIRCUMFERENCE = 12.56;  //In inches
+
+    //Distance to be traveled
+    double distance;
+
+    //Rotations to be made
+    double rotations;
+
+    //Counts to be counted
+    double counts;
+    //-------------------------------------------
 
     //Initialize state machine
     enum State {drivingStraight, turning, enteringGoal, actionDone};
@@ -26,6 +43,7 @@ public class CookieMonsterAutoB1 extends OpMode{
         //Map drive motors
         motorLeft = hardwareMap.dcMotor.get("motor_1");
         motorRight = hardwareMap.dcMotor.get("motor_2");
+        //motorGrabber = hardwareMap.dcMotor.get("motor_3");
 
         //Reverse right motor
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -45,36 +63,101 @@ public class CookieMonsterAutoB1 extends OpMode{
         switch (state) {
 
             case drivingStraight: //Drive to field goal
+                //Set distance (in inches)
+                distance = 24;
 
-                //Sets motor's target position
-                motorLeft.setTargetPosition(-280);
-                motorRight.setTargetPosition(-280);
+                //Calculate counts needed
+                rotations = distance / CIRCUMFERENCE;
+                counts = ENCODER_CPR * rotations * GEAR_RATIO;
 
-                //Makes motors run to that position
+                //Set motor target positions
+                motorLeft.setTargetPosition((int)-counts);
+                motorRight.setTargetPosition((int)-counts);
+
+                //Make motors run to that position
                 motorLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
                 motorRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
-                //Robot forward
+                //Set motor power
                 motorLeft.setPower(1);
                 motorRight.setPower(1);
 
-                int leftPosition = motorLeft.getCurrentPosition();
-                int rightPosition = motorRight.getCurrentPosition();
+                //Spin grabber outward
+                //motorGrabber.setPower(-1);
 
-                //Checks if motors worked and switches state
-                if (leftPosition == 280 && rightPosition == 280) {
-                    state = State.turning;
-                }
+                //Change state to do next step
+                state = State.turning;
 
                 break;
 
             case turning: //Turn into goal
-                
-                motorLeft.setPower(-0.5);
-                motorRight.setPower(0.5);
+
+                //Reset encoders for new movement block
+                motorLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+                motorLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+
+                //Set distance (in inches)
+                distance = 10;
+
+                //Calculate counts needed
+                rotations = distance /CIRCUMFERENCE;
+                counts = ENCODER_CPR * rotations * GEAR_RATIO;
+
+                //Set motor target positions
+                motorLeft.setTargetPosition((int)counts);
+                motorRight.setTargetPosition((int)-counts);
+
+                //Make motors run to that position
+                motorLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+                motorRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+                //Set motor power
+                motorLeft.setPower(-1);
+                motorRight.setPower(1);
+
+                //Spin grabber outward
+                //motorGrabber.setPower(-1);
+
+                //Change state to do next step
+                state = State.enteringGoal;
 
                 break;
 
+            case enteringGoal: //Robot forward into goal
+
+                //Reset encoders for new movement block
+                motorLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+                motorLeft.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+
+                //Set distance (in inches)
+                distance = 5;
+
+                //Calculate counts needed
+                rotations = distance /CIRCUMFERENCE;
+                counts = ENCODER_CPR * rotations * GEAR_RATIO;
+
+                //Set motor target positions
+                motorLeft.setTargetPosition((int)-counts);
+                motorRight.setTargetPosition((int)-counts);
+
+                //Make motors run to that position
+                motorLeft.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+                motorRight.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
+                //Set motor power
+                motorLeft.setPower(0.3);
+                motorRight.setPower(0.3);
+
+                //Spin grabber outward
+                //motorGrabber.setPower(-1);
+
+                //Change state to do next step
+                state = State.actionDone;
+
+                break;
+
+            case actionDone: //Finishes program
+                break;
         }
 
         //Telemetry
