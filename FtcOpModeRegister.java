@@ -81,11 +81,6 @@ public class FtcOpModeRegister implements OpModeRegister {
 
     manager.register("K9TeleOp", K9TeleOp.class);
     manager.register("K9TankDrive", K9TankDrive.class);
-    manager.register("K9IrSeeker", K9IrSeeker.class);
-    manager.register("K9Line", K9Line.class);
-    manager.register("FINAALL", FINAALL.class);
-    manager.register("ServoTEST", ServoTEST.class);
-    manager.register("RTDrive", RTDrive.class);
     manager.register("TELEOP", TELEOP.class);
 
     /*
@@ -98,11 +93,8 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
 
     manager.register("PushBotManual", PushBotManual.class);
-    manager.register("PushBotAuto", PushBotAuto.class);
-    manager.register("PushBotDriveTouch", PushBotDriveTouch.class);
-    manager.register("PushBotIrSeek", PushBotIrSeek.class);
-    manager.register("PushBotSquare", PushBotSquare.class);
     manager.register("AutonomousMode", AutonomousMode.class);
+    manager.register("AutoB1", AutoB1.class);
 
   }
 }
