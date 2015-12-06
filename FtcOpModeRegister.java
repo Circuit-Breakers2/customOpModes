@@ -86,6 +86,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("FINAALL", FINAALL.class);
     manager.register("ServoTEST", ServoTEST.class);
     manager.register("RTDrive", RTDrive.class);
+    manager.register("TELEOP", TELEOP.class);
 
     /*
      * The following example op modes are designed to work with a pushbot-style robot.
