@@ -5,6 +5,8 @@
 CookieMonsterAutoB1.java
 
 ###Driver Control Period:
-K9TeleOp.java
+TELEPOP.java
+
+Add O's for subsequent versions
 
 uselessOps is useless
