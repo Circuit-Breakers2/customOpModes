@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 /**
  * Created by CircuitBreakers2 on 11/5/2015.
  */
-public class TELEPOP extends OpMode {
+public class TELEOP extends OpMode {
     
     //initialize motors
     DcMotor motorRight;
